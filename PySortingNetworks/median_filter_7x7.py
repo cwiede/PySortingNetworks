@@ -138,7 +138,7 @@ if __name__ == "__main__":
     else:
         s7x7 = from_scratch(premerge=False)
     print("Number of operations", s7x7.nops())
-    print("Operations in 7x7median filter loop", s7x7.nops(list(range(14, 59))) - 16*6)
+    print("Operations in 7x7median filter loop", s7x7.nops(list(range(24, 59))) - 16*6)
     print(s7x7)
     def geninputs():
         for n1, n2, n3, n4, n5, n6, n7 in product(list(range(8)), list(range(8)), list(range(8)), 

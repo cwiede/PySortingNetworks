@@ -164,7 +164,7 @@ if __name__ == "__main__":
     if False:
         s5x5 = from_scratch(premerge=True)
     else:
-        s5x5 = batcher()
+        s5x5 = best_known()
     print("Number of operations", s5x5.nops())
     print("Operations in 5x5 median filter loop", s5x5.nops(list(range(12, 25))) - 9*4)
     print(s5x5)
