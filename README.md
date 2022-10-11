@@ -45,8 +45,8 @@ iteration needs 25 - 6 - 5 = **14 swap operations**.
 ![image](https://user-images.githubusercontent.com/62332054/195198336-ca0fd1c1-d610-487a-a0dc-ff56608723a1.png)
 
 This network has **150 swap operations** for a complete sort, which is not an optimal network for 25 elements. However, 
-sorting only the upper half of the pixels in a median filtering iteration need 150 - 4*9 - 21 = **93 swap operations**.
-Finding the median needs 150 - 4*9 - 21 - 16 = **77 swap operations**.
+sorting only the upper half of the pixels in a median filtering iteration need 150 - 4\*9 - 21 = **93 swap operations**.
+Finding the median needs 150 - 4\*9 - 21 - 16 = **77 swap operations**.
 
 This network was found using a greedy strategy for all comparisons following the initial sorting of the rows/columns.
 
@@ -57,8 +57,8 @@ This network was found using a greedy strategy for all comparisons following the
 ![image](https://user-images.githubusercontent.com/62332054/195200924-532532c2-116b-4ef3-b2b3-b9d62833eea8.png)
 
 This network has **405 swap operations** for a complete sort, which is not an optimal network for 49 elements. However, 
-sorting only the upper half of the pixels in a median filtering iteration need 405 - 6*16 - 37 = **272 swap operations**.
-Finding the median needs 405 - 5*16 - 37 - 42 = **230 swap operations**.
+sorting only the upper half of the pixels in a median filtering iteration need 405 - 6\*16 - 37 = **272 swap operations**.
+Finding the median needs 405 - 5\*16 - 37 - 42 = **230 swap operations**.
 
 This network was found by consecutively applying batcher merges to the pre-sorted values. 
 
