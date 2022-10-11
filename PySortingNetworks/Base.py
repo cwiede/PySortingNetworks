@@ -56,19 +56,19 @@ class BaseSortingNetwork:
                     for k in range(len(cols)):
                         cols[k] += chr(0x250a)
             for k in range(min(i,j)):
-                cols[k] += chr(0x2500)
+                cols[k] += chr(0x2500) if k != self.n//2 else chr(0x2501)
             if i < j:
-                cols[i] += chr(0x252c)
+                cols[i] += chr(0x252c) if i != self.n//2 else chr(0x252f)
                 for k in range(i+1, j):
-                    cols[k] += chr(0x253c)
-                cols[j] += chr(0x2534)
+                    cols[k] += chr(0x253c) if k != self.n//2 else chr(0x253f)
+                cols[j] += chr(0x2534) if j != self.n//2 else chr(0x2537)
             else:
-                cols[j] += chr(0x2565)
+                cols[j] += chr(0x2530) if j != self.n//2 else chr(0x2533)
                 for k in range(j+1, i):
-                    cols[k] += chr(0x256b)
-                cols[i] += chr(0x2568)
+                    cols[k] += chr(0x2542) if k != self.n//2 else chr(0x254b)
+                cols[i] += chr(0x2538) if i != self.n//2 else chr(0x253b)
             for k in range(max(i,j)+1, len(cols)):
-                cols[k] = cols[k] + chr(0x2500)
+                cols[k] += chr(0x2500) if k != self.n//2 else chr(0x2501)
         return repr(self) + "\n" + ("\n".join(cols))
     
     def __repr__(self):
@@ -161,8 +161,8 @@ BaseSortingNetwork(
     def normalize(self, method, sections=None):
         if sections is None and self.sections is not None:
             sections = [name for name, _ in self.sections]
-        opidx2secname = self.opidx2secname()
         if method == "lower_indices_last":
+            opidx2secname = self.opidx2secname()
             changed = True
             while changed:
                 changed = False
@@ -175,6 +175,89 @@ BaseSortingNetwork(
                             if i0 != j0 and i0 != j1 and i1 != j0 and i1 != j1:
                                 self.ops[i], self.ops[i+1] = self.ops[i+1], self.ops[i]
                                 changed = True
+            return
+        if method == "higher_indices_last":
+            opidx2secname = self.opidx2secname()
+            changed = True
+            while changed:
+                changed = False
+                for i in range(len(self.ops)-1):
+                    if opidx2secname is None or (opidx2secname[i] in sections and opidx2secname[i+1] in sections):
+                        i0, i1 = self.ops[i]
+                        j0, j1 = self.ops[i+1]
+                        if j0 < i0:
+                            # we'd like to swap the elements if possible
+                            if i0 != j0 and i0 != j1 and i1 != j0 and i1 != j1:
+                                self.ops[i], self.ops[i+1] = self.ops[i+1], self.ops[i]
+                                changed = True
+            return            
+        if method == "non_median_last":
+            opidx2secname = self.opidx2secname()
+            idx_median = self.n // 2
+            changed = True
+            while changed:
+                last_median_idx = 0
+                for i in range(len(self.ops)):
+                    i0, i1 = self.ops[i]
+                    if i0 == idx_median or i1 == idx_median:
+                        last_median_idx = i
+                for start in range(len(self.ops)-2):
+                    for i in range(start, len(self.ops)-1):
+                        if opidx2secname is None or (opidx2secname[i] in sections and opidx2secname[i+1] in sections):
+                            i0, i1 = self.ops[i]
+                            j0, j1 = self.ops[i+1]
+                            if i0 != idx_median and i1 != idx_median:
+                                # we'd like to swap the elements if possible
+                                if i0 != j0 and i0 != j1 and i1 != j0 and i1 != j1:
+                                    self.ops[i], self.ops[i+1] = self.ops[i+1], self.ops[i]
+                    curr_median_idx = 0
+                    for i in range(len(self.ops)):
+                        i0, i1 = self.ops[i]
+                        if i0 == idx_median or i1 == idx_median:
+                            curr_median_idx = i
+                    changed = last_median_idx > curr_median_idx
+                    if changed:
+                        break
+            return
+        if method == "median_first_lower_indices_last":
+            self.normalize("lower_indices_last", sections=sections)
+            # fix the last indices
+            fixed_from = len(self.ops)
+            idx_median = self.n // 2
+            while fixed_from > 0:
+                i, j = self.ops[fixed_from-1]
+                if i >= idx_median or j >= idx_median:
+                    break
+                fixed_from -= 1
+            last_ops = self.ops[fixed_from:]
+            self.ops = self.ops[:fixed_from]
+            self.normalize("non_median_last", sections=sections)
+            self.ops = self.ops + last_ops
+            last_median_idx = None
+            opidx2secname = self.opidx2secname()
+            for k in range(len(self.ops)):
+                i,j = self.ops[k]
+                if i == idx_median or j == idx_median and (opidx2secname is None or opidx2secname[k] in sections):
+                    last_median_idx = k+1
+            first_ops = self.ops[:last_median_idx]
+            self.ops = self.ops[last_median_idx:]
+            self.normalize("lower_indices_last", sections=None)
+            self.ops = first_ops + self.ops
+            # add sections for median and upper half sorted positions
+            last_median_idx = None
+            last_upper_half_idx = None
+            for k in range(len(self.ops)):
+                i,j = self.ops[k]
+                if i == idx_median or j == idx_median:
+                    last_median_idx = k+1
+                    last_upper_half_idx = k+1
+                elif i > idx_median or j > idx_median:
+                    last_upper_half_idx = k+1
+            if last_median_idx is not None:
+                self.sections.append( ("median", last_median_idx) )
+            if last_upper_half_idx is not None:
+                self.sections.append( ("last_upper_half_sorted", last_upper_half_idx) )
+            self.sections.sort(key=lambda x: x[1])
             return
         raise RuntimeError("Unknown method %s" % method)
         
