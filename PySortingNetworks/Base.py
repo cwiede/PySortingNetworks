@@ -1,3 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2022 Christoph Wiedemann
+#
+# THE PROGRAM IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+#
+
+
 class BaseSortingNetwork:
     def __init__(self, n, ops=None, sections=None):
         assert n >= 0

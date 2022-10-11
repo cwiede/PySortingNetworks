@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2022 Christoph Wiedemann
+#
+# THE PROGRAM IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+#
+
 import random
 
 def _base(sn, geninputs, select, doprint=False):

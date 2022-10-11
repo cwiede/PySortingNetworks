@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2022 Christoph Wiedemann
+#
+# THE PROGRAM IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+#
+
 from PySortingNetworks.Base import BaseSortingNetwork
 
 def sort2():
