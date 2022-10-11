@@ -157,7 +157,7 @@ def best_known():
              (13, 14), (14, 15), (10, 11), (11, 12), (12, 13), (8, 9), (9, 10), (10, 11), (7, 8), (8, 9), (1, 6), 
              (3, 6), (6, 7), (0, 5), (2, 5), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9), (9, 10), (3, 4), (1, 3), 
              (3, 4), (4, 5), (1, 2)], 
-        sections=[('input sorters', 0), ('merge 2 of the sorted 5 lists to sorted 10 lists', 45), ('final merging network', 45)]
+        sections=[('input sorters', 0), ('final merging network', 45)]
     )
 
 if __name__ == "__main__":
@@ -165,8 +165,10 @@ if __name__ == "__main__":
         s5x5 = from_scratch(premerge=True)
     else:
         s5x5 = best_known()
+        s5x5.normalize("median_first_lower_indices_last", ["final merging network"])
     print("Number of operations", s5x5.nops())
-    print("Operations in 5x5 median filter loop", s5x5.nops(list(range(12, 25))) - 9*4)
+    print("Operations in 5x5 upper half sorted filter loop", s5x5.nops(list(range(12, 25))) - 9*4)
+    print("Operations in 5x5 median filter loop", s5x5.nops([12]) - 9*4)
     print(s5x5)
     passed, failed = s5x5.test(product(*([[0,1]]*25)))
     print("passed", passed, "failed", failed)
